@@ -50,40 +50,42 @@ class NotesController {
   async index(request,response){
     const { title, user_id, tags } = request.query
 
-    let notes;
+    let notes
 
-    if(tags) {
-      const filterTags = tags.split(',').map(tag => tag.trim())
-
-      notes = await knex("movietags")
-      .select ([
+    if (tags) {
+      const filterTags = tags.split(',').map(tag => tag)
+      
+      notes = await knex ("movietags")
+      .select([
         "movienotes.id",
         "movienotes.title",
-        "movienotes.user_id",
+        "movienotes.user_id"
       ])
-      .where ("movienotes.user_id", user_id)
-      .whereLike ("movienotes.title", `%${title}%`)
+      .where("movienotes.user_id", user_id)
+      .whereLike("movienotes.title", `%${title}%`)
       .whereIn("name", filterTags)
       .innerJoin("movienotes", "movienotes.id", "movietags.movienote_id")
       .orderBy("movienotes.title")
 
+      console.log(notes)
+
     } else {
       notes = await knex ("movienotes")
-        .where({ user_id })
-        .whereLike("title", `%${title}%`)
-        .orderBy("title")
+      .where({ user_id })
+      .whereLike("title",`%${title}%`)
+      .orderBy("title")
     }
 
     const userTags = await knex("movietags").where({ user_id })
-    const notesWithTags = notes.map(note => {
-    const noteTags = userTags.filter(tag => tag.note_id === note.id)
+    const notesWithTags = notes.map (note => {
+      const noteTags = userTags.filter(tag => tag.note_id === note.id)
 
-      return{
-        ...notes,
+      return {
+        ...note,
         tags: noteTags
       }
+      
     })
-    
     return response.json(notesWithTags)
 
   }
