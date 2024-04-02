@@ -67,8 +67,6 @@ class NotesController {
       .innerJoin("movienotes", "movienotes.id", "movietags.movienote_id")
       .orderBy("movienotes.title")
 
-      console.log(notes)
-
     } else {
       notes = await knex ("movienotes")
       .where({ user_id })
